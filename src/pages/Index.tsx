@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Wallet, TrendingUp, BarChart3, Percent, Play, Square, XCircle, AlertOctagon, SlidersHorizontal,
+  Wallet, TrendingUp, BarChart3, Percent, Play, Square, XCircle, AlertOctagon, SlidersHorizontal, Plus,
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
@@ -13,6 +13,7 @@ import AIMarketMode from "@/components/dashboard/AIMarketMode";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import PriceTicker from "@/components/dashboard/PriceTicker";
 import EquityCurve from "@/components/dashboard/EquityCurve";
+import TradeEntryForm from "@/components/dashboard/TradeEntryForm";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import RiskTab from "@/pages/RiskTab";
@@ -76,6 +77,7 @@ const DashboardTab = () => {
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [tradeFormOpen, setTradeFormOpen] = useState(false);
 
   const tabs: Record<string, React.ReactNode> = {
     dashboard: <DashboardTab />,
@@ -102,6 +104,18 @@ const Index = () => {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* FAB - New Trade */}
+      <motion.button
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        onClick={() => setTradeFormOpen(true)}
+        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full gold-gradient gold-glow-strong flex items-center justify-center shadow-lg"
+      >
+        <Plus className="w-6 h-6 text-primary-foreground" />
+      </motion.button>
+
+      <TradeEntryForm open={tradeFormOpen} onClose={() => setTradeFormOpen(false)} />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
