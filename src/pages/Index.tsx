@@ -11,6 +11,8 @@ import MiniChart from "@/components/dashboard/MiniChart";
 import SessionIndicator from "@/components/dashboard/SessionIndicator";
 import AIMarketMode from "@/components/dashboard/AIMarketMode";
 import StatusBadge from "@/components/dashboard/StatusBadge";
+import PriceTicker from "@/components/dashboard/PriceTicker";
+import EquityCurve from "@/components/dashboard/EquityCurve";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import RiskTab from "@/pages/RiskTab";
@@ -38,6 +40,9 @@ const DashboardTab = () => {
 
       {/* Chart */}
       <MiniChart />
+
+      {/* Equity Curve */}
+      <EquityCurve />
 
       {/* AI + Sessions */}
       <div className="grid grid-cols-1 gap-3">
@@ -83,6 +88,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background max-w-md mx-auto">
       <Header />
+      <PriceTicker />
       <main className="px-4 py-4 pb-24">
         <AnimatePresence mode="wait">
           <motion.div
