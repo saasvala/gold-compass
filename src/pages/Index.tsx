@@ -16,6 +16,7 @@ import EquityCurve from "@/components/dashboard/EquityCurve";
 import TradeEntryForm from "@/components/dashboard/TradeEntryForm";
 import ModeSelector from "@/components/dashboard/ModeSelector";
 import ModeStats from "@/components/dashboard/ModeStats";
+import ModeCompare from "@/components/dashboard/ModeCompare";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import RiskTab from "@/pages/RiskTab";
@@ -27,41 +28,33 @@ const DashboardTab = ({ mode }: { mode: TradingMode }) => {
 
   return (
     <div className="space-y-4">
-      {/* Status Bar */}
       <div className="flex items-center gap-2 flex-wrap">
         <StatusBadge label="Live Trading" active={isTrading} />
         <StatusBadge label={mode.shortName + " Mode"} active={true} />
         <StatusBadge label="News: Clear" active={true} />
       </div>
 
-      {/* Mode Stats */}
       <ModeStats mode={mode} />
 
-      {/* Metrics Grid */}
       <div className="grid grid-cols-2 gap-3">
         <MetricCard icon={Wallet} label="Balance" value="$12,480" subValue="+$420 today" trend="up" delay={0} />
-        <MetricCard icon={TrendingUp} label="Equity" value="$12,640" subValue="+1.28%" trend="up" delay={0.1} />
-        <MetricCard icon={BarChart3} label="Daily P/L" value="+$420" subValue="3 wins, 1 loss" trend="up" delay={0.2} />
-        <MetricCard icon={Percent} label="Drawdown" value="4.2%" subValue={`Max: ${mode.maxDD}`} trend="neutral" delay={0.3} />
+        <MetricCard icon={TrendingUp} label="Equity" value="$12,640" subValue="+1.28%" trend="up" delay={0.05} />
+        <MetricCard icon={BarChart3} label="Daily P/L" value="+$420" subValue="3 wins, 1 loss" trend="up" delay={0.1} />
+        <MetricCard icon={Percent} label="Drawdown" value="4.2%" subValue={`Max: ${mode.maxDD}`} trend="neutral" delay={0.15} />
       </div>
 
-      {/* Chart */}
       <MiniChart />
-
-      {/* Equity Curve */}
       <EquityCurve />
 
-      {/* AI + Sessions */}
       <div className="grid grid-cols-1 gap-3">
         <AIMarketMode mode={mode} />
         <SessionIndicator />
       </div>
 
-      {/* Controls */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.3 }}
       >
         <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Quick Controls</p>
         <div className="grid grid-cols-5 gap-2">
@@ -81,9 +74,17 @@ const DashboardTab = ({ mode }: { mode: TradingMode }) => {
   );
 };
 
+const pageTransition = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { type: "spring" as const, damping: 30, stiffness: 300 },
+};
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [tradeFormOpen, setTradeFormOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
   const [activeMode, setActiveMode] = useState<TradingMode>(TRADING_MODES[4]);
 
   const tabs: Record<string, React.ReactNode> = {
@@ -99,14 +100,15 @@ const Index = () => {
       <Header mode={activeMode} />
       <PriceTicker />
       <main className="px-4 py-4 pb-24 space-y-4">
-        <ModeSelector activeMode={activeMode} onModeChange={setActiveMode} />
+        <ModeSelector
+          activeMode={activeMode}
+          onModeChange={setActiveMode}
+          onCompare={() => setCompareOpen(true)}
+        />
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab + activeMode.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            {...pageTransition}
           >
             {tabs[activeTab]}
           </motion.div>
@@ -115,8 +117,8 @@ const Index = () => {
 
       {/* FAB - New Trade */}
       <motion.button
-        whileTap={{ scale: 0.9 }}
-        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.85, rotate: 90 }}
+        whileHover={{ scale: 1.1 }}
         onClick={() => setTradeFormOpen(true)}
         className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full gold-gradient gold-glow-strong flex items-center justify-center shadow-lg"
       >
@@ -124,6 +126,12 @@ const Index = () => {
       </motion.button>
 
       <TradeEntryForm open={tradeFormOpen} onClose={() => setTradeFormOpen(false)} />
+      <ModeCompare
+        open={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        activeMode={activeMode}
+        onSelect={setActiveMode}
+      />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
