@@ -14,12 +14,15 @@ import StatusBadge from "@/components/dashboard/StatusBadge";
 import PriceTicker from "@/components/dashboard/PriceTicker";
 import EquityCurve from "@/components/dashboard/EquityCurve";
 import TradeEntryForm from "@/components/dashboard/TradeEntryForm";
+import ModeSelector from "@/components/dashboard/ModeSelector";
+import ModeStats from "@/components/dashboard/ModeStats";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import RiskTab from "@/pages/RiskTab";
 import SettingsTab from "@/pages/SettingsTab";
+import { TRADING_MODES, TradingMode } from "@/lib/modes";
 
-const DashboardTab = () => {
+const DashboardTab = ({ mode }: { mode: TradingMode }) => {
   const [isTrading, setIsTrading] = useState(true);
 
   return (
@@ -27,16 +30,19 @@ const DashboardTab = () => {
       {/* Status Bar */}
       <div className="flex items-center gap-2 flex-wrap">
         <StatusBadge label="Live Trading" active={isTrading} />
-        <StatusBadge label="London Session" active={true} />
+        <StatusBadge label={mode.shortName + " Mode"} active={true} />
         <StatusBadge label="News: Clear" active={true} />
       </div>
+
+      {/* Mode Stats */}
+      <ModeStats mode={mode} />
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 gap-3">
         <MetricCard icon={Wallet} label="Balance" value="$12,480" subValue="+$420 today" trend="up" delay={0} />
         <MetricCard icon={TrendingUp} label="Equity" value="$12,640" subValue="+1.28%" trend="up" delay={0.1} />
         <MetricCard icon={BarChart3} label="Daily P/L" value="+$420" subValue="3 wins, 1 loss" trend="up" delay={0.2} />
-        <MetricCard icon={Percent} label="Drawdown" value="4.2%" subValue="Max: 10%" trend="neutral" delay={0.3} />
+        <MetricCard icon={Percent} label="Drawdown" value="4.2%" subValue={`Max: ${mode.maxDD}`} trend="neutral" delay={0.3} />
       </div>
 
       {/* Chart */}
@@ -47,7 +53,7 @@ const DashboardTab = () => {
 
       {/* AI + Sessions */}
       <div className="grid grid-cols-1 gap-3">
-        <AIMarketMode />
+        <AIMarketMode mode={mode} />
         <SessionIndicator />
       </div>
 
@@ -78,23 +84,25 @@ const DashboardTab = () => {
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [tradeFormOpen, setTradeFormOpen] = useState(false);
+  const [activeMode, setActiveMode] = useState<TradingMode>(TRADING_MODES[4]);
 
   const tabs: Record<string, React.ReactNode> = {
-    dashboard: <DashboardTab />,
-    strategy: <StrategyTab />,
+    dashboard: <DashboardTab mode={activeMode} />,
+    strategy: <StrategyTab mode={activeMode} />,
     trades: <TradesTab />,
-    risk: <RiskTab />,
-    settings: <SettingsTab />,
+    risk: <RiskTab mode={activeMode} />,
+    settings: <SettingsTab mode={activeMode} />,
   };
 
   return (
     <div className="min-h-screen bg-background max-w-md mx-auto">
-      <Header />
+      <Header mode={activeMode} />
       <PriceTicker />
-      <main className="px-4 py-4 pb-24">
+      <main className="px-4 py-4 pb-24 space-y-4">
+        <ModeSelector activeMode={activeMode} onModeChange={setActiveMode} />
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeTab}
+            key={activeTab + activeMode.id}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
