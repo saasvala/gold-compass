@@ -17,13 +17,15 @@ import TradeEntryForm from "@/components/dashboard/TradeEntryForm";
 import ModeSelector from "@/components/dashboard/ModeSelector";
 import ModeStats from "@/components/dashboard/ModeStats";
 import ModeCompare from "@/components/dashboard/ModeCompare";
+import NotificationCenter from "@/components/dashboard/NotificationCenter";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import RiskTab from "@/pages/RiskTab";
 import SettingsTab from "@/pages/SettingsTab";
 import { TRADING_MODES, TradingMode } from "@/lib/modes";
+import { useNotifications } from "@/hooks/use-notifications";
 
-const DashboardTab = ({ mode }: { mode: TradingMode }) => {
+const DashboardTab = ({ mode, onKillSwitch }: { mode: TradingMode; onKillSwitch: () => void }) => {
   const [isTrading, setIsTrading] = useState(true);
 
   return (
@@ -66,7 +68,7 @@ const DashboardTab = ({ mode }: { mode: TradingMode }) => {
           />
           <ControlButton icon={Play} label="Start" variant="primary" active />
           <ControlButton icon={XCircle} label="Close All" variant="secondary" />
-          <ControlButton icon={AlertOctagon} label="Kill" variant="danger" />
+          <ControlButton icon={AlertOctagon} label="Kill" variant="danger" onClick={onKillSwitch} />
           <ControlButton icon={SlidersHorizontal} label="Risk" variant="secondary" />
         </div>
       </motion.div>
@@ -85,10 +87,21 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [tradeFormOpen, setTradeFormOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [activeMode, setActiveMode] = useState<TradingMode>(TRADING_MODES[4]);
+  const { notifications, addNotification, markAsRead, markAllRead, clearAll, unreadCount } = useNotifications();
+
+  const handleKillSwitch = () => {
+    addNotification("killswitch", "Kill Switch Activated", "All positions closed. Trading halted immediately.");
+  };
+
+  const handleModeChange = (mode: TradingMode) => {
+    setActiveMode(mode);
+    addNotification("info", "Mode Switched", `Active mode changed to ${mode.name}`);
+  };
 
   const tabs: Record<string, React.ReactNode> = {
-    dashboard: <DashboardTab mode={activeMode} />,
+    dashboard: <DashboardTab mode={activeMode} onKillSwitch={handleKillSwitch} />,
     strategy: <StrategyTab mode={activeMode} />,
     trades: <TradesTab />,
     risk: <RiskTab mode={activeMode} />,
@@ -97,12 +110,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background max-w-md mx-auto">
-      <Header mode={activeMode} />
+      <Header
+        mode={activeMode}
+        unreadCount={unreadCount}
+        onNotificationsClick={() => setNotificationsOpen(true)}
+      />
       <PriceTicker />
       <main className="px-4 py-4 pb-24 space-y-4">
         <ModeSelector
           activeMode={activeMode}
-          onModeChange={setActiveMode}
+          onModeChange={handleModeChange}
           onCompare={() => setCompareOpen(true)}
         />
         <AnimatePresence mode="wait">
@@ -130,7 +147,15 @@ const Index = () => {
         open={compareOpen}
         onClose={() => setCompareOpen(false)}
         activeMode={activeMode}
-        onSelect={setActiveMode}
+        onSelect={handleModeChange}
+      />
+      <NotificationCenter
+        open={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+        notifications={notifications}
+        onMarkRead={markAsRead}
+        onMarkAllRead={markAllRead}
+        onClearAll={clearAll}
       />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>

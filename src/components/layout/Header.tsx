@@ -1,8 +1,14 @@
 import { motion } from "framer-motion";
-import { Gem, Bell, Wifi } from "lucide-react";
+import { Bell, Wifi } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
 
-const Header = ({ mode }: { mode: TradingMode }) => {
+interface HeaderProps {
+  mode: TradingMode;
+  unreadCount?: number;
+  onNotificationsClick?: () => void;
+}
+
+const Header = ({ mode, unreadCount = 0, onNotificationsClick }: HeaderProps) => {
   const ModeIcon = mode.icon;
   return (
     <motion.header
@@ -26,10 +32,22 @@ const Header = ({ mode }: { mode: TradingMode }) => {
             <Wifi className="w-3.5 h-3.5 text-success" />
             <span className="text-[9px] font-mono text-success">MT5</span>
           </div>
-          <button className="relative">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={onNotificationsClick}
+            className="relative"
+          >
             <Bell className="w-4 h-4 text-muted-foreground" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary pulse-gold" />
-          </button>
+            {unreadCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 rounded-full bg-primary flex items-center justify-center"
+              >
+                <span className="text-[8px] font-bold text-primary-foreground px-1">{unreadCount > 9 ? "9+" : unreadCount}</span>
+              </motion.span>
+            )}
+          </motion.button>
         </div>
       </div>
     </motion.header>
