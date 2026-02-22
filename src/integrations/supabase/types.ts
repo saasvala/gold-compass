@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trade_history: {
         Row: {
           created_at: string
@@ -97,6 +124,86 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      trade_journal: {
+        Row: {
+          created_at: string
+          direction: string
+          emotion: string | null
+          entry_price: number
+          id: string
+          lessons: string | null
+          lot_size: number
+          mistakes: string | null
+          notes: string | null
+          profit_usd: number | null
+          rating: number | null
+          result: string | null
+          rr_ratio: number | null
+          screenshot_url: string | null
+          setup_type: string | null
+          sl_price: number
+          tp_price: number
+          trade_id: string | null
+          trading_mode: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          emotion?: string | null
+          entry_price: number
+          id?: string
+          lessons?: string | null
+          lot_size?: number
+          mistakes?: string | null
+          notes?: string | null
+          profit_usd?: number | null
+          rating?: number | null
+          result?: string | null
+          rr_ratio?: number | null
+          screenshot_url?: string | null
+          setup_type?: string | null
+          sl_price: number
+          tp_price: number
+          trade_id?: string | null
+          trading_mode: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          emotion?: string | null
+          entry_price?: number
+          id?: string
+          lessons?: string | null
+          lot_size?: number
+          mistakes?: string | null
+          notes?: string | null
+          profit_usd?: number | null
+          rating?: number | null
+          result?: string | null
+          rr_ratio?: number | null
+          screenshot_url?: string | null
+          setup_type?: string | null
+          sl_price?: number
+          tp_price?: number
+          trade_id?: string | null
+          trading_mode?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_journal_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trade_history"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_preferences: {
         Row: {

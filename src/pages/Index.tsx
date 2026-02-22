@@ -20,6 +20,7 @@ import ModeCompare from "@/components/dashboard/ModeCompare";
 import NotificationCenter from "@/components/dashboard/NotificationCenter";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
+import JournalTab from "@/pages/JournalTab";
 import RiskTab from "@/pages/RiskTab";
 import SettingsTab from "@/pages/SettingsTab";
 import { TRADING_MODES, TradingMode } from "@/lib/modes";
@@ -104,6 +105,7 @@ const Index = () => {
     dashboard: <DashboardTab mode={activeMode} onKillSwitch={handleKillSwitch} />,
     strategy: <StrategyTab mode={activeMode} />,
     trades: <TradesTab />,
+    journal: <JournalTab mode={activeMode} />,
     risk: <RiskTab mode={activeMode} />,
     settings: <SettingsTab mode={activeMode} />,
   };
