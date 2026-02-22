@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Bell, Wifi } from "lucide-react";
+import { Bell, Wifi, LogOut } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
+import { useAuth } from "@/hooks/use-auth";
 
 interface HeaderProps {
   mode: TradingMode;
@@ -10,6 +11,8 @@ interface HeaderProps {
 
 const Header = ({ mode, unreadCount = 0, onNotificationsClick }: HeaderProps) => {
   const ModeIcon = mode.icon;
+  const { user, signOut } = useAuth();
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -48,6 +51,16 @@ const Header = ({ mode, unreadCount = 0, onNotificationsClick }: HeaderProps) =>
               </motion.span>
             )}
           </motion.button>
+          {user && (
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={signOut}
+              className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center"
+              title="Logout"
+            >
+              <LogOut className="w-3.5 h-3.5 text-muted-foreground" />
+            </motion.button>
+          )}
         </div>
       </div>
     </motion.header>
