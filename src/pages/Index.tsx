@@ -23,8 +23,13 @@ import TradesTab from "@/pages/TradesTab";
 import JournalTab from "@/pages/JournalTab";
 import RiskTab from "@/pages/RiskTab";
 import SettingsTab from "@/pages/SettingsTab";
+import BotsTab from "@/pages/BotsTab";
+import AdminDashboard from "@/pages/AdminDashboard";
+import InvestorDashboard from "@/pages/InvestorDashboard";
+import ResellerDashboard from "@/pages/ResellerDashboard";
 import { TRADING_MODES, TradingMode } from "@/lib/modes";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useUserRole } from "@/hooks/use-user-role";
 
 const DashboardTab = ({ mode, onKillSwitch }: { mode: TradingMode; onKillSwitch: () => void }) => {
   const [isTrading, setIsTrading] = useState(true);
@@ -91,6 +96,7 @@ const Index = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [activeMode, setActiveMode] = useState<TradingMode>(TRADING_MODES[4]);
   const { notifications, addNotification, markAsRead, markAllRead, clearAll, unreadCount } = useNotifications();
+  const { role } = useUserRole();
 
   const handleKillSwitch = () => {
     addNotification("killswitch", "Kill Switch Activated", "All positions closed. Trading halted immediately.");
@@ -108,6 +114,10 @@ const Index = () => {
     journal: <JournalTab mode={activeMode} />,
     risk: <RiskTab mode={activeMode} />,
     settings: <SettingsTab mode={activeMode} />,
+    bots: <BotsTab />,
+    admin: <AdminDashboard />,
+    portfolio: <InvestorDashboard />,
+    referrals: <ResellerDashboard />,
   };
 
   return (
@@ -159,7 +169,7 @@ const Index = () => {
         onMarkAllRead={markAllRead}
         onClearAll={clearAll}
       />
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} role={role} />
     </div>
   );
 };
