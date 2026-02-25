@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, ToggleLeft, ToggleRight, Power, PowerOff, TrendingUp, TrendingDown, Search, Filter, Plus, Trash2, Activity, Zap } from "lucide-react";
+import { Bot, ToggleLeft, ToggleRight, Power, PowerOff, TrendingUp, TrendingDown, Search, Filter, Plus, Trash2, Activity, Zap, Eye } from "lucide-react";
 import { BOT_CATEGORIES, BOT_TYPES, getRiskColor, type BotType } from "@/lib/bot-types";
 import { useBots } from "@/hooks/use-bots";
 import { toast } from "sonner";
+import BotDetailPage from "@/pages/BotDetailPage";
+import type { Tables } from "@/integrations/supabase/types";
+
+type BotConfig = Tables<"bot_configs">;
 
 const BotsTab = () => {
   const [isDemo, setIsDemo] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"my" | "catalog">("my");
+  const [selectedBot, setSelectedBot] = useState<BotConfig | null>(null);
   const { bots, loading, activateBot, toggleBotStatus, deleteBot, updateBotDemo } = useBots();
 
   const filteredCatalog = BOT_TYPES.filter((b) => {
@@ -35,6 +40,17 @@ const BotsTab = () => {
     await deleteBot(id);
     toast.success(`${name} removed`);
   };
+
+  // Bot detail view
+  if (selectedBot) {
+    return (
+      <BotDetailPage
+        bot={selectedBot}
+        onBack={() => setSelectedBot(null)}
+        onToggle={handleToggle}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -118,10 +134,18 @@ const BotsTab = () => {
                     className={`glass-card rounded-xl p-3 ${isActive ? "gold-border gold-glow" : "border border-border/30"}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isActive ? "gold-gradient" : "bg-secondary"}`}>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSelectedBot(bot)}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isActive ? "gold-gradient" : "bg-secondary"}`}
+                      >
                         <Bot className={`w-5 h-5 ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setSelectedBot(bot)}
+                        className="flex-1 min-w-0 text-left"
+                      >
                         <div className="flex items-center gap-1.5">
                           <p className={`text-xs font-bold truncate ${isActive ? "gold-text" : "text-foreground"}`}>{bot.name}</p>
                           {isActive && <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />}
@@ -138,7 +162,7 @@ const BotsTab = () => {
                             {bot.is_demo ? "DEMO" : "LIVE"}
                           </span>
                         </div>
-                      </div>
+                      </motion.button>
                       <div className="flex flex-col gap-1">
                         <motion.button
                           whileTap={{ scale: 0.85 }}
@@ -170,7 +194,7 @@ const BotsTab = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search 56+ bot types..."
+              placeholder={`Search ${BOT_TYPES.length}+ bot types...`}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl glass-card gold-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 bg-transparent"
             />
           </div>
@@ -218,7 +242,7 @@ const BotsTab = () => {
                         <span className={`text-[8px] font-mono uppercase px-1.5 py-0.5 rounded ${getRiskColor(bot.risk)} bg-secondary/50`}>{bot.risk}</span>
                       </div>
                       <p className="text-[9px] text-muted-foreground truncate">{bot.description}</p>
-                      <div className="flex gap-1 mt-1">
+                      <div className="flex gap-1 mt-1 flex-wrap">
                         {bot.strategies.map((s) => (
                           <span key={s} className="text-[8px] px-1.5 py-0.5 rounded bg-secondary/70 text-muted-foreground">{s}</span>
                         ))}
