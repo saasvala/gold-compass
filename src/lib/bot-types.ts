@@ -2,6 +2,8 @@ import {
   TrendingUp, Bitcoin, BarChart3, Gem, Fuel, Globe, Layers, Brain,
   ArrowRightLeft, Zap, Activity, Target, Shield, Gauge, Copy, Grid3X3,
   LineChart, Newspaper, BarChart, Briefcase, RefreshCw, Cpu, Users,
+  GitBranch, Crosshair, ScanLine, Boxes, DollarSign, PieChart, Calendar,
+  Radio, Waypoints, Lock, Umbrella, Blend, Eye, Server, Building2, Cog,
   type LucideIcon,
 } from "lucide-react";
 
@@ -24,7 +26,10 @@ export const BOT_CATEGORIES = [
   { id: "indices", name: "Indices", icon: Globe, color: "primary" },
   { id: "options", name: "Options", icon: Layers, color: "destructive" },
   { id: "futures", name: "Futures", icon: Fuel, color: "warning" },
+  { id: "synthetic", name: "Synthetic", icon: Radio, color: "accent" },
   { id: "ai", name: "AI Powered", icon: Brain, color: "primary" },
+  { id: "special", name: "Specialty", icon: Zap, color: "accent" },
+  { id: "enterprise", name: "Enterprise", icon: Building2, color: "primary" },
   { id: "special", name: "Specialty", icon: Zap, color: "accent" },
 ] as const;
 
@@ -74,12 +79,18 @@ export const BOT_TYPES: BotType[] = [
 
   { id: "futures-commodity", name: "Commodity Futures", category: "futures", icon: Fuel, description: "Agricultural & energy futures", markets: ["CL", "GC", "ZW"], strategies: ["Spread", "Calendar"], risk: "high" },
   { id: "futures-index", name: "Index Futures", category: "futures", icon: Globe, description: "Stock index futures", markets: ["ES", "NQ", "YM"], strategies: ["Scalp", "Swing"], risk: "high" },
+  { id: "futures-hedge", name: "Futures Hedging", category: "futures", icon: Umbrella, description: "Portfolio hedge optimization", markets: ["ES", "NQ", "GC"], strategies: ["Delta Neutral", "Hedge Ratio"], risk: "medium" },
+
+  { id: "synthetic-indices", name: "Synthetic Indices", category: "synthetic", icon: Radio, description: "Pattern recognition + volatility spike", markets: ["V75", "V100", "Crash/Boom"], strategies: ["Pattern", "Circuit Break"], risk: "ultra" },
+  { id: "synthetic-vol", name: "Volatility Breakout", category: "synthetic", icon: Activity, description: "ATR expansion entry signals", markets: ["Multi-Asset"], strategies: ["ATR Expand", "Vol Squeeze"], risk: "high" },
 
   { id: "ai-trend", name: "AI Trend Predictor", category: "ai", icon: Brain, description: "ML-powered trend detection", markets: ["Multi-Asset"], strategies: ["LSTM", "Transformer"], risk: "medium" },
   { id: "ai-mean-rev", name: "AI Mean Reversion", category: "ai", icon: Brain, description: "Statistical mean reversion", markets: ["Pairs"], strategies: ["Z-Score", "Cointegration"], risk: "medium" },
   { id: "ai-sentiment", name: "AI Sentiment", category: "ai", icon: Brain, description: "News & social sentiment", markets: ["All"], strategies: ["NLP", "Scoring"], risk: "medium" },
   { id: "ai-rl", name: "AI Reinforcement", category: "ai", icon: Cpu, description: "Self-optimizing RL agent", markets: ["Multi-Asset"], strategies: ["PPO", "DQN"], risk: "high" },
   { id: "ai-adaptive", name: "AI Adaptive", category: "ai", icon: Brain, description: "Auto-adjusting parameters", markets: ["Multi-Asset"], strategies: ["Ensemble"], risk: "medium" },
+  { id: "ai-lstm", name: "AI Predictive LSTM", category: "ai", icon: Brain, description: "Deep learning price forecasting", markets: ["Multi-Asset"], strategies: ["LSTM", "Seq2Seq"], risk: "high" },
+  { id: "ai-transformer", name: "Transformer Forecast", category: "ai", icon: Cpu, description: "Multi-timeframe attention model", markets: ["Multi-Asset"], strategies: ["Attention", "Positional"], risk: "high" },
 
   { id: "copy-trade", name: "Copy Trading", category: "special", icon: Copy, description: "Mirror top traders", markets: ["Multi-Asset"], strategies: ["Mirror", "Scale"], risk: "medium" },
   { id: "portfolio-rebal", name: "Portfolio Rebalancer", category: "special", icon: RefreshCw, description: "Auto-rebalance allocations", markets: ["Multi-Asset"], strategies: ["Target Weight"], risk: "low" },
@@ -87,9 +98,34 @@ export const BOT_TYPES: BotType[] = [
   { id: "backtest", name: "Backtesting Engine", category: "special", icon: Gauge, description: "Strategy simulation", markets: ["Historical"], strategies: ["Monte Carlo", "Walk-Forward"], risk: "low" },
   { id: "signal-sub", name: "Signal Subscription", category: "special", icon: Target, description: "Paid signal service", markets: ["Multi-Asset"], strategies: ["Curated"], risk: "medium" },
   { id: "social-sentiment", name: "Social Sentiment", category: "special", icon: Users, description: "Twitter & Reddit analysis", markets: ["Crypto", "Stocks"], strategies: ["Sentiment Score"], risk: "medium" },
-  { id: "seasonal", name: "Seasonal Patterns", category: "special", icon: RefreshCw, description: "Seasonal commodity/stock", markets: ["Commodities", "Stocks"], strategies: ["Calendar Effect"], risk: "low" },
+  { id: "seasonal", name: "Seasonal Patterns", category: "special", icon: Calendar, description: "Historical seasonal trends", markets: ["Commodities", "Stocks"], strategies: ["Calendar Effect"], risk: "low" },
   { id: "stat-arb", name: "Statistical Arbitrage", category: "special", icon: ArrowRightLeft, description: "Pairs & basket trading", markets: ["Equities", "Forex"], strategies: ["Pairs", "Basket"], risk: "medium" },
   { id: "hybrid", name: "Hybrid Multi-Strategy", category: "special", icon: Zap, description: "Grid + trend + swing combined", markets: ["Multi-Asset"], strategies: ["Ensemble", "Adaptive"], risk: "high" },
+  { id: "divergence", name: "Divergence Scanner", category: "special", icon: GitBranch, description: "RSI/MACD divergence detection", markets: ["Multi-Asset"], strategies: ["Regular Div", "Hidden Div"], risk: "medium" },
+  { id: "liquidity-hunt", name: "Liquidity Hunt", category: "special", icon: Crosshair, description: "Detect stop-loss clusters & sweeps", markets: ["Forex", "Crypto"], strategies: ["Stop Hunt", "Liquidity Grab"], risk: "high" },
+  { id: "smc", name: "Smart Money Concept", category: "special", icon: Eye, description: "Order blocks + liquidity zones", markets: ["Forex", "Indices"], strategies: ["OB", "FVG", "BOS"], risk: "medium" },
+  { id: "harmonic", name: "Harmonic Pattern", category: "special", icon: Waypoints, description: "Auto-detect Gartley, Bat, Butterfly", markets: ["Multi-Asset"], strategies: ["Harmonic Scan", "Ratio"], risk: "medium" },
+  { id: "fibonacci", name: "Fibonacci Retracement", category: "special", icon: ScanLine, description: "AI retracement probability scoring", markets: ["Multi-Asset"], strategies: ["Fib Level", "Extension"], risk: "medium" },
+  { id: "dca", name: "DCA Bot", category: "special", icon: DollarSign, description: "Dollar-cost averaging engine", markets: ["Crypto", "Stocks"], strategies: ["Fixed DCA", "Smart DCA"], risk: "low" },
+  { id: "breakout", name: "Breakout Bot", category: "special", icon: Zap, description: "Volume + price expansion detection", markets: ["Multi-Asset"], strategies: ["Vol Breakout", "Range Break"], risk: "high" },
+  { id: "volume-profile", name: "Volume Profile", category: "special", icon: BarChart, description: "High-volume node entries", markets: ["Futures", "Stocks"], strategies: ["POC", "Value Area"], risk: "medium" },
+  { id: "order-flow", name: "Order Flow", category: "special", icon: Activity, description: "Level 2 data analysis", markets: ["Futures", "Crypto"], strategies: ["Delta", "Footprint"], risk: "high" },
+  { id: "market-structure", name: "Market Structure", category: "special", icon: TrendingUp, description: "HH/HL LH/LL detection", markets: ["Multi-Asset"], strategies: ["BOS", "CHoCH"], risk: "medium" },
+  { id: "contrarian", name: "Sentiment Contrarian", category: "special", icon: ArrowRightLeft, description: "Trade opposite crowd extremes", markets: ["Multi-Asset"], strategies: ["Extreme Fear", "Extreme Greed"], risk: "high" },
+  { id: "correlation", name: "Correlation Bot", category: "special", icon: Blend, description: "Multi-asset correlation matrix", markets: ["Multi-Asset"], strategies: ["Corr Shift", "Decoupling"], risk: "medium" },
+  { id: "drawdown-protect", name: "Drawdown Protection", category: "special", icon: Shield, description: "Auto trade pause on drawdown", markets: ["All"], strategies: ["Max DD", "Trailing DD"], risk: "low" },
+  { id: "capital-preserve", name: "Capital Preservation", category: "special", icon: Lock, description: "Low-risk yield optimization", markets: ["Bonds", "Stables"], strategies: ["Yield Farm", "T-Bill"], risk: "low" },
+  { id: "swing-news", name: "Swing + News Hybrid", category: "special", icon: Newspaper, description: "Multi-condition engine", markets: ["Stocks", "Forex"], strategies: ["Swing", "Event"], risk: "medium" },
+  { id: "auto-hedge", name: "Auto Hedge", category: "special", icon: Umbrella, description: "Portfolio delta neutralization", markets: ["Options", "Futures"], strategies: ["Delta Hedge", "Gamma Scalp"], risk: "medium" },
+  { id: "cross-market", name: "Cross-Market", category: "special", icon: Globe, description: "Forex + Crypto correlation trading", markets: ["Forex", "Crypto"], strategies: ["Lead-Lag", "Spread"], risk: "high" },
+
+  { id: "etf-rotation", name: "ETF Rotation", category: "enterprise", icon: PieChart, description: "Sector rotation AI model", markets: ["ETFs"], strategies: ["Momentum Rotate", "Risk Parity"], risk: "medium" },
+  { id: "global-macro", name: "Global Macro", category: "enterprise", icon: Globe, description: "Macro indicator driven trades", markets: ["Multi-Asset"], strategies: ["GDP", "Rate Diff"], risk: "high" },
+  { id: "event-driven", name: "Event-Driven", category: "enterprise", icon: Calendar, description: "Auto trade earnings, FOMC, CPI", markets: ["Stocks", "Forex"], strategies: ["Event", "Vol Crush"], risk: "high" },
+  { id: "multi-broker", name: "Multi-Broker Execution", category: "enterprise", icon: Server, description: "Smart order routing across brokers", markets: ["Multi-Asset"], strategies: ["Best Exec", "SOR"], risk: "medium" },
+  { id: "cloud-strategy", name: "Cloud Strategy Manager", category: "enterprise", icon: Cog, description: "Remote strategy control panel", markets: ["All"], strategies: ["Remote Deploy", "Version Control"], risk: "low" },
+  { id: "white-label", name: "White-Label Reseller", category: "enterprise", icon: Building2, description: "Multi-client management dashboard", markets: ["All"], strategies: ["Multi-Tenant", "Branded"], risk: "low" },
+  { id: "enterprise-erp", name: "Enterprise Trading ERP", category: "enterprise", icon: Boxes, description: "CRM + payments + reports + investor panel", markets: ["All"], strategies: ["Full Suite"], risk: "low" },
 ];
 
 export const getRiskColor = (risk: BotType["risk"]) => {
