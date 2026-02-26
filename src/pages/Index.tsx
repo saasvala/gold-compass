@@ -30,6 +30,7 @@ import ResellerDashboard from "@/pages/ResellerDashboard";
 import { TRADING_MODES, TradingMode } from "@/lib/modes";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useUserRole } from "@/hooks/use-user-role";
+import { useBotSimulation } from "@/hooks/use-bot-simulation";
 
 const DashboardTab = ({ mode, onKillSwitch }: { mode: TradingMode; onKillSwitch: () => void }) => {
   const [isTrading, setIsTrading] = useState(true);
@@ -97,6 +98,7 @@ const Index = () => {
   const [activeMode, setActiveMode] = useState<TradingMode>(TRADING_MODES[4]);
   const { notifications, addNotification, markAsRead, markAllRead, clearAll, unreadCount } = useNotifications();
   const { role } = useUserRole();
+  useBotSimulation();
 
   const handleKillSwitch = () => {
     addNotification("killswitch", "Kill Switch Activated", "All positions closed. Trading halted immediately.");
