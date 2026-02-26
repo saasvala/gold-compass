@@ -30,7 +30,6 @@ export const BOT_CATEGORIES = [
   { id: "ai", name: "AI Powered", icon: Brain, color: "primary" },
   { id: "special", name: "Specialty", icon: Zap, color: "accent" },
   { id: "enterprise", name: "Enterprise", icon: Building2, color: "primary" },
-  { id: "special", name: "Specialty", icon: Zap, color: "accent" },
 ] as const;
 
 export const BOT_TYPES: BotType[] = [
