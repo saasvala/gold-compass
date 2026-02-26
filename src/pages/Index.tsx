@@ -27,6 +27,7 @@ import BotsTab from "@/pages/BotsTab";
 import AdminDashboard from "@/pages/AdminDashboard";
 import InvestorDashboard from "@/pages/InvestorDashboard";
 import ResellerDashboard from "@/pages/ResellerDashboard";
+import LeaderboardTab from "@/pages/LeaderboardTab";
 import { TRADING_MODES, TradingMode } from "@/lib/modes";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -117,6 +118,7 @@ const Index = () => {
     risk: <RiskTab mode={activeMode} />,
     settings: <SettingsTab mode={activeMode} />,
     bots: <BotsTab />,
+    leaderboard: <LeaderboardTab />,
     admin: <AdminDashboard />,
     portfolio: <InvestorDashboard />,
     referrals: <ResellerDashboard />,

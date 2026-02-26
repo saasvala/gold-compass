@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { LayoutDashboard, BarChart3, Settings, Shield, Activity, BookOpen, Bot, Crown, Users, Eye } from "lucide-react";
+import { LayoutDashboard, BarChart3, Settings, Shield, Activity, BookOpen, Bot, Crown, Users, Eye, Trophy } from "lucide-react";
 import { AppRole } from "@/hooks/use-user-role";
 
 interface BottomNavProps {
@@ -12,6 +12,7 @@ const getTabsForRole = (role: AppRole) => {
   const common = [
     { id: "dashboard", icon: LayoutDashboard, label: "Home" },
     { id: "bots", icon: Bot, label: "Bots" },
+    { id: "leaderboard", icon: Trophy, label: "Ranks" },
   ];
 
   switch (role) {

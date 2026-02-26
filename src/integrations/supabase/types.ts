@@ -345,6 +345,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_bot_leaderboard: {
+        Args: never
+        Returns: {
+          avg_pnl: number
+          avg_trades: number
+          avg_win_rate: number
+          best_pnl: number
+          bot_category: string
+          bot_type: string
+          sharpe_ratio: number
+          total_pnl: number
+          total_users: number
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
