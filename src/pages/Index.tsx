@@ -18,6 +18,7 @@ import ModeSelector from "@/components/dashboard/ModeSelector";
 import ModeStats from "@/components/dashboard/ModeStats";
 import ModeCompare from "@/components/dashboard/ModeCompare";
 import NotificationCenter from "@/components/dashboard/NotificationCenter";
+import IntelligenceDashboard from "@/components/dashboard/IntelligenceDashboard";
 import StrategyTab from "@/pages/StrategyTab";
 import TradesTab from "@/pages/TradesTab";
 import JournalTab from "@/pages/JournalTab";
@@ -113,6 +114,7 @@ const Index = () => {
   const tabs: Record<string, React.ReactNode> = {
     dashboard: <DashboardTab mode={activeMode} onKillSwitch={handleKillSwitch} />,
     strategy: <StrategyTab mode={activeMode} />,
+    intel: <IntelligenceDashboard />,
     trades: <TradesTab />,
     journal: <JournalTab mode={activeMode} />,
     risk: <RiskTab mode={activeMode} />,

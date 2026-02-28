@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { LayoutDashboard, BarChart3, Settings, Shield, Activity, BookOpen, Bot, Crown, Users, Eye, Trophy } from "lucide-react";
+import { LayoutDashboard, BarChart3, Settings, Shield, Activity, BookOpen, Bot, Crown, Users, Eye, Trophy, Brain } from "lucide-react";
 import { AppRole } from "@/hooks/use-user-role";
 
 interface BottomNavProps {
@@ -40,8 +40,8 @@ const getTabsForRole = (role: AppRole) => {
       return [
         { id: "dashboard", icon: LayoutDashboard, label: "Home" },
         { id: "strategy", icon: BarChart3, label: "Strategy" },
+        { id: "intel", icon: Brain, label: "Intel" },
         { id: "bots", icon: Bot, label: "Bots" },
-        { id: "journal", icon: BookOpen, label: "Journal" },
         { id: "risk", icon: Shield, label: "Risk" },
         { id: "settings", icon: Settings, label: "Settings" },
       ];

@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          resource: string | null
+          severity: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resource?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resource?: string | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bot_configs: {
         Row: {
           bot_category: string
@@ -121,6 +157,86 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      signal_analysis: {
+        Row: {
+          ai_confidence: number | null
+          bot_id: string | null
+          created_at: string
+          direction: string | null
+          entry_reason: string | null
+          executed: boolean | null
+          execution_quality: number | null
+          expected_value: number | null
+          fill_type: string | null
+          id: string
+          latency_ms: number | null
+          momentum_score: number | null
+          overall_confidence: number | null
+          rejected_reason: string | null
+          rr_ratio: number | null
+          slippage_pips: number | null
+          spread_at_entry: number | null
+          trend_score: number | null
+          user_id: string
+          volatility_score: number | null
+          volume_score: number | null
+        }
+        Insert: {
+          ai_confidence?: number | null
+          bot_id?: string | null
+          created_at?: string
+          direction?: string | null
+          entry_reason?: string | null
+          executed?: boolean | null
+          execution_quality?: number | null
+          expected_value?: number | null
+          fill_type?: string | null
+          id?: string
+          latency_ms?: number | null
+          momentum_score?: number | null
+          overall_confidence?: number | null
+          rejected_reason?: string | null
+          rr_ratio?: number | null
+          slippage_pips?: number | null
+          spread_at_entry?: number | null
+          trend_score?: number | null
+          user_id: string
+          volatility_score?: number | null
+          volume_score?: number | null
+        }
+        Update: {
+          ai_confidence?: number | null
+          bot_id?: string | null
+          created_at?: string
+          direction?: string | null
+          entry_reason?: string | null
+          executed?: boolean | null
+          execution_quality?: number | null
+          expected_value?: number | null
+          fill_type?: string | null
+          id?: string
+          latency_ms?: number | null
+          momentum_score?: number | null
+          overall_confidence?: number | null
+          rejected_reason?: string | null
+          rr_ratio?: number | null
+          slippage_pips?: number | null
+          spread_at_entry?: number | null
+          trend_score?: number | null
+          user_id?: string
+          volatility_score?: number | null
+          volume_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_analysis_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bot_configs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
