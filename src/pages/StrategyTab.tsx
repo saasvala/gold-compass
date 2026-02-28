@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Target, TrendingUp, TrendingDown, Layers, BarChart, Crosshair, ArrowRightLeft, Zap, Activity, Gauge } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
+import SignalConfidence from "@/components/dashboard/SignalConfidence";
 
 const modeStrategies: Record<string, { name: string; desc: string; icon: any; active: boolean }[]> = {
   aggressive: [
@@ -45,6 +46,8 @@ const StrategyTab = ({ mode }: { mode: TradingMode }) => {
 
   return (
     <div className="space-y-4">
+      <SignalConfidence />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

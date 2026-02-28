@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Server, Key, Newspaper, Sliders, Clock, Globe, Cpu, Zap, Shield, Target } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
+import SecurityPanel from "@/components/dashboard/SecurityPanel";
 
 const baseSettings = [
   {
@@ -74,6 +75,8 @@ const SettingsTab = ({ mode }: { mode: TradingMode }) => {
 
   return (
     <div className="space-y-4">
+      <SecurityPanel />
+
       {sections.map((section, si) => (
         <motion.div
           key={section.title}

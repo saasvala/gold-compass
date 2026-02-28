@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Shield, AlertTriangle, Lock, Gauge, Ban, Clock, TrendingDown } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
+import RiskMeter from "@/components/dashboard/RiskMeter";
 
 const modeRiskParams: Record<string, { icon: any; label: string; value: string; max: string }[]> = {
   aggressive: [
@@ -53,15 +54,18 @@ const RiskTab = ({ mode }: { mode: TradingMode }) => {
 
   return (
     <div className="space-y-4">
+      <RiskMeter />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
         className="glass-card gold-border rounded-xl p-4 gold-glow"
       >
         <div className="flex items-center gap-2 mb-4">
           <Shield className="w-4 h-4 text-primary" />
           <p className="text-xs text-muted-foreground uppercase tracking-wider">
-            Risk Engine · {mode.shortName}
+            Mode Parameters · {mode.shortName}
           </p>
         </div>
         <div className="flex items-center justify-between mb-2">
@@ -85,7 +89,7 @@ const RiskTab = ({ mode }: { mode: TradingMode }) => {
             key={param.label}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05 }}
+            transition={{ delay: 0.25 + i * 0.05 }}
             className="glass-card gold-border rounded-xl p-3 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
@@ -105,7 +109,7 @@ const RiskTab = ({ mode }: { mode: TradingMode }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.5 }}
         className="glass-card rounded-xl p-4 border border-destructive/30"
       >
         <div className="flex items-center gap-2 mb-2">
