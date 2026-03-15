@@ -101,6 +101,60 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_connections: {
+        Row: {
+          api_key_encrypted: string | null
+          api_secret_encrypted: string | null
+          broker_name: string
+          broker_type: string
+          connection_status: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_testnet: boolean
+          last_connected_at: string | null
+          metadata: Json | null
+          passphrase_encrypted: string | null
+          permissions: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          api_secret_encrypted?: string | null
+          broker_name: string
+          broker_type?: string
+          connection_status?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_testnet?: boolean
+          last_connected_at?: string | null
+          metadata?: Json | null
+          passphrase_encrypted?: string | null
+          permissions?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          api_secret_encrypted?: string | null
+          broker_name?: string
+          broker_type?: string
+          connection_status?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_testnet?: boolean
+          last_connected_at?: string | null
+          metadata?: Json | null
+          passphrase_encrypted?: string | null
+          permissions?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -131,6 +185,250 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          avg_fill_price: number | null
+          bot_id: string | null
+          broker_connection_id: string | null
+          broker_order_id: string | null
+          cancelled_at: string | null
+          commission: number | null
+          created_at: string
+          filled_at: string | null
+          filled_quantity: number
+          id: string
+          metadata: Json | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          price: number | null
+          quantity: number
+          rejection_reason: string | null
+          side: Database["public"]["Enums"]["order_side"]
+          status: Database["public"]["Enums"]["order_status"]
+          stop_price: number | null
+          strategy_id: string | null
+          submitted_at: string | null
+          symbol: string
+          time_in_force: string
+          trail_percent: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_fill_price?: number | null
+          bot_id?: string | null
+          broker_connection_id?: string | null
+          broker_order_id?: string | null
+          cancelled_at?: string | null
+          commission?: number | null
+          created_at?: string
+          filled_at?: string | null
+          filled_quantity?: number
+          id?: string
+          metadata?: Json | null
+          order_type?: Database["public"]["Enums"]["order_type"]
+          price?: number | null
+          quantity: number
+          rejection_reason?: string | null
+          side: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_price?: number | null
+          strategy_id?: string | null
+          submitted_at?: string | null
+          symbol: string
+          time_in_force?: string
+          trail_percent?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_fill_price?: number | null
+          bot_id?: string | null
+          broker_connection_id?: string | null
+          broker_order_id?: string | null
+          cancelled_at?: string | null
+          commission?: number | null
+          created_at?: string
+          filled_at?: string | null
+          filled_quantity?: number
+          id?: string
+          metadata?: Json | null
+          order_type?: Database["public"]["Enums"]["order_type"]
+          price?: number | null
+          quantity?: number
+          rejection_reason?: string | null
+          side?: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_price?: number | null
+          strategy_id?: string | null
+          submitted_at?: string | null
+          symbol?: string
+          time_in_force?: string
+          trail_percent?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bot_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_snapshots: {
+        Row: {
+          created_at: string
+          drawdown_percent: number | null
+          exposure_by_asset: Json | null
+          id: string
+          max_drawdown_percent: number | null
+          open_positions_count: number | null
+          realized_pnl: number
+          snapshot_type: string
+          total_balance: number
+          total_equity: number
+          total_margin_used: number | null
+          unrealized_pnl: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          drawdown_percent?: number | null
+          exposure_by_asset?: Json | null
+          id?: string
+          max_drawdown_percent?: number | null
+          open_positions_count?: number | null
+          realized_pnl?: number
+          snapshot_type?: string
+          total_balance?: number
+          total_equity?: number
+          total_margin_used?: number | null
+          unrealized_pnl?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          drawdown_percent?: number | null
+          exposure_by_asset?: Json | null
+          id?: string
+          max_drawdown_percent?: number | null
+          open_positions_count?: number | null
+          realized_pnl?: number
+          snapshot_type?: string
+          total_balance?: number
+          total_equity?: number
+          total_margin_used?: number | null
+          unrealized_pnl?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      positions: {
+        Row: {
+          avg_entry_price: number
+          bot_id: string | null
+          broker_connection_id: string | null
+          closed_at: string | null
+          created_at: string
+          current_price: number | null
+          id: string
+          is_open: boolean
+          leverage: number | null
+          liquidation_price: number | null
+          margin_used: number | null
+          metadata: Json | null
+          opened_at: string
+          quantity: number
+          realized_pnl: number | null
+          side: Database["public"]["Enums"]["order_side"]
+          stop_loss: number | null
+          symbol: string
+          take_profit: number | null
+          unrealized_pnl: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_entry_price: number
+          bot_id?: string | null
+          broker_connection_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          is_open?: boolean
+          leverage?: number | null
+          liquidation_price?: number | null
+          margin_used?: number | null
+          metadata?: Json | null
+          opened_at?: string
+          quantity: number
+          realized_pnl?: number | null
+          side: Database["public"]["Enums"]["order_side"]
+          stop_loss?: number | null
+          symbol: string
+          take_profit?: number | null
+          unrealized_pnl?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_entry_price?: number
+          bot_id?: string | null
+          broker_connection_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          is_open?: boolean
+          leverage?: number | null
+          liquidation_price?: number | null
+          margin_used?: number | null
+          metadata?: Json | null
+          opened_at?: string
+          quantity?: number
+          realized_pnl?: number | null
+          side?: Database["public"]["Enums"]["order_side"]
+          stop_loss?: number | null
+          symbol?: string
+          take_profit?: number | null
+          unrealized_pnl?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "positions_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bot_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "positions_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -157,6 +455,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      risk_events: {
+        Row: {
+          action_taken: string | null
+          bot_id: string | null
+          created_at: string
+          description: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          resolved: boolean
+          resolved_at: string | null
+          severity: string
+          threshold_value: number | null
+          trigger_value: number | null
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          bot_id?: string | null
+          created_at?: string
+          description: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          threshold_value?: number | null
+          trigger_value?: number | null
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          bot_id?: string | null
+          created_at?: string
+          description?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          threshold_value?: number | null
+          trigger_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_events_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bot_configs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       signal_analysis: {
         Row: {
@@ -231,6 +585,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "signal_analysis_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bot_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strategies: {
+        Row: {
+          backtest_results: Json | null
+          bot_id: string | null
+          created_at: string
+          description: string | null
+          entry_rules: Json
+          exit_rules: Json
+          id: string
+          is_active: boolean
+          name: string
+          parameters: Json
+          risk_params: Json
+          strategy_type: string
+          symbols: string[]
+          timeframe: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backtest_results?: Json | null
+          bot_id?: string | null
+          created_at?: string
+          description?: string | null
+          entry_rules?: Json
+          exit_rules?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          parameters?: Json
+          risk_params?: Json
+          strategy_type?: string
+          symbols?: string[]
+          timeframe?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backtest_results?: Json | null
+          bot_id?: string | null
+          created_at?: string
+          description?: string | null
+          entry_rules?: Json
+          exit_rules?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          parameters?: Json
+          risk_params?: Json
+          strategy_type?: string
+          symbols?: string[]
+          timeframe?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategies_bot_id_fkey"
             columns: ["bot_id"]
             isOneToOne: false
             referencedRelation: "bot_configs"
@@ -489,6 +908,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "trader" | "investor" | "reseller"
+      order_side: "buy" | "sell"
+      order_status:
+        | "pending"
+        | "submitted"
+        | "partial_fill"
+        | "filled"
+        | "cancelled"
+        | "rejected"
+        | "expired"
+      order_type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -617,6 +1046,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "trader", "investor", "reseller"],
+      order_side: ["buy", "sell"],
+      order_status: [
+        "pending",
+        "submitted",
+        "partial_fill",
+        "filled",
+        "cancelled",
+        "rejected",
+        "expired",
+      ],
+      order_type: ["market", "limit", "stop", "stop_limit", "trailing_stop"],
     },
   },
 } as const
