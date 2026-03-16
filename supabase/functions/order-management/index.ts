@@ -72,8 +72,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body: OrderRequest = await req.json();
+    // Rate limit: 30 order actions per minute
+    const allowed = await checkRateLimit(supabase, user.id, "order-management", 30, 60);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Max 30 requests/minute." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    const body: OrderRequest = await req.json();
     switch (body.action) {
       case "create": {
         if (!body.symbol || !body.side || !body.quantity) {
