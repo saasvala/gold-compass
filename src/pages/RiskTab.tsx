@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Shield, AlertTriangle, Lock, Gauge, Ban, Clock, TrendingDown } from "lucide-react";
+import { Shield, AlertTriangle, Lock, Gauge, Ban, Clock, TrendingDown, Activity } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
 import RiskMeter from "@/components/dashboard/RiskMeter";
+import { useRiskEvents } from "@/hooks/use-risk-events";
 
 const modeRiskParams: Record<string, { icon: any; label: string; value: string; max: string }[]> = {
   aggressive: [
