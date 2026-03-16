@@ -532,7 +532,7 @@ const ResultView = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] text-muted-foreground uppercase">Order ID</p>
-              <p className="text-xs font-mono text-foreground">#{Math.floor(100000 + Math.random() * 900000)}</p>
+              <p className="text-xs font-mono text-foreground">#{(window as any).__lastOrderId || "------"}</p>
             </div>
             <div className="text-right">
               <p className="text-[9px] text-muted-foreground uppercase">Status</p>

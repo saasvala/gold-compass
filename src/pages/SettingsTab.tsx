@@ -77,6 +77,7 @@ const SettingsTab = ({ mode }: { mode: TradingMode }) => {
   return (
     <div className="space-y-4">
       <SecurityPanel />
+      <BrokerConnectionPanel />
 
       {sections.map((section, si) => (
         <motion.div

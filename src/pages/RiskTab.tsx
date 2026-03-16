@@ -127,6 +127,45 @@ const RiskTab = ({ mode }: { mode: TradingMode }) => {
           Activate Kill Switch
         </motion.button>
       </motion.div>
+
+      {/* Live Risk Events */}
+      {unresolvedEvents.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="glass-card gold-border rounded-xl p-4"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="w-4 h-4 text-warning" />
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">
+              Active Risk Events ({unresolvedEvents.length})
+            </p>
+          </div>
+          <div className="space-y-2">
+            {unresolvedEvents.slice(0, 5).map((event) => (
+              <div
+                key={event.id}
+                className={`p-2.5 rounded-lg border ${
+                  event.severity === "critical"
+                    ? "border-destructive/40 bg-destructive/10"
+                    : "border-warning/40 bg-warning/10"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-foreground">{event.event_type}</span>
+                  <span className={`text-[9px] uppercase font-bold ${
+                    event.severity === "critical" ? "text-destructive" : "text-warning"
+                  }`}>
+                    {event.severity}
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">{event.description}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
