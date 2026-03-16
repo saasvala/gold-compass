@@ -70,15 +70,27 @@ const TradeEntryForm = ({ open, onClose }: TradeFormProps) => {
     setConfirmState("confirming");
   }, [calc.valid]);
 
-  const handleConfirm = useCallback(() => {
+  const [orderId, setOrderId] = useState<string | null>(null);
+
+  const handleConfirm = useCallback(async () => {
     setConfirmState("processing");
-    // Simulate order processing
-    setTimeout(() => {
-      const success = Math.random() > 0.15; // 85% success rate
-      setConfirmState(success ? "success" : "error");
-      playSound(success ? "success" : "error");
-    }, 1800);
-  }, [playSound]);
+    try {
+      const result = await createOrder({
+        symbol: "XAUUSD",
+        side: direction.toLowerCase() as "buy" | "sell",
+        order_type: "market",
+        quantity: parseFloat(lotSize) || 0.1,
+        price: parseFloat(entry) || undefined,
+      });
+      setOrderId(result?.order?.id || null);
+      setConfirmState("success");
+      playSound("success");
+    } catch (err) {
+      console.error("Order failed:", err);
+      setConfirmState("error");
+      playSound("error");
+    }
+  }, [createOrder, direction, lotSize, entry, playSound]);
 
   const handleReset = useCallback(() => {
     setConfirmState("idle");
