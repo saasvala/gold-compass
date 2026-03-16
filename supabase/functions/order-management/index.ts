@@ -6,6 +6,26 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Rate limiter
+async function checkRateLimit(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  endpoint: string,
+  maxRequests: number,
+  windowSeconds: number
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - windowSeconds * 1000).toISOString();
+  const { count } = await supabase
+    .from("rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("endpoint", endpoint)
+    .gte("window_start", windowStart);
+  if ((count ?? 0) >= maxRequests) return false;
+  await supabase.from("rate_limits").insert({ user_id: userId, endpoint, window_start: new Date().toISOString() });
+  return true;
+}
+
 interface OrderRequest {
   action: "create" | "cancel" | "update_status" | "list" | "get";
   order_id?: string;
@@ -52,8 +72,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body: OrderRequest = await req.json();
+    // Rate limit: 30 order actions per minute
+    const allowed = await checkRateLimit(supabase, user.id, "order-management", 30, 60);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Max 30 requests/minute." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    const body: OrderRequest = await req.json();
     switch (body.action) {
       case "create": {
         if (!body.symbol || !body.side || !body.quantity) {
