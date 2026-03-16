@@ -11,6 +11,7 @@ interface TradeFormProps {
 type ConfirmState = "idle" | "confirming" | "processing" | "success" | "error";
 
 const TradeEntryForm = ({ open, onClose }: TradeFormProps) => {
+  const { createOrder } = useOrders();
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [entry, setEntry] = useState("2647.00");
   const [sl, setSl] = useState("2640.00");
