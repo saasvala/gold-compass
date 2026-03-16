@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, TrendingUp, TrendingDown, Target, ShieldAlert, X, ChevronDown, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useOrders } from "@/hooks/use-orders";
 
 interface TradeFormProps {
   open: boolean;
