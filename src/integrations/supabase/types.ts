@@ -155,6 +155,63 @@ export type Database = {
         }
         Relationships: []
       }
+      market_data: {
+        Row: {
+          ask: number | null
+          bid: number | null
+          close: number | null
+          created_at: string
+          data_type: string
+          exchange: string
+          high: number | null
+          id: string
+          low: number | null
+          metadata: Json | null
+          open: number | null
+          spread: number | null
+          symbol: string
+          timeframe: string | null
+          timestamp: string
+          volume: number | null
+        }
+        Insert: {
+          ask?: number | null
+          bid?: number | null
+          close?: number | null
+          created_at?: string
+          data_type?: string
+          exchange?: string
+          high?: number | null
+          id?: string
+          low?: number | null
+          metadata?: Json | null
+          open?: number | null
+          spread?: number | null
+          symbol: string
+          timeframe?: string | null
+          timestamp?: string
+          volume?: number | null
+        }
+        Update: {
+          ask?: number | null
+          bid?: number | null
+          close?: number | null
+          created_at?: string
+          data_type?: string
+          exchange?: string
+          high?: number | null
+          id?: string
+          low?: number | null
+          metadata?: Json | null
+          open?: number | null
+          spread?: number | null
+          symbol?: string
+          timeframe?: string | null
+          timestamp?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -453,6 +510,33 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          request_count: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          request_count?: number
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          request_count?: number
+          user_id?: string
+          window_start?: string
         }
         Relationships: []
       }
