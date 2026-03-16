@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, TrendingUp, TrendingDown, Target, ShieldAlert, X, ChevronDown, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useOrders } from "@/hooks/use-orders";
 
 interface TradeFormProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface TradeFormProps {
 type ConfirmState = "idle" | "confirming" | "processing" | "success" | "error";
 
 const TradeEntryForm = ({ open, onClose }: TradeFormProps) => {
+  const { createOrder } = useOrders();
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [entry, setEntry] = useState("2647.00");
   const [sl, setSl] = useState("2640.00");
@@ -68,15 +70,27 @@ const TradeEntryForm = ({ open, onClose }: TradeFormProps) => {
     setConfirmState("confirming");
   }, [calc.valid]);
 
-  const handleConfirm = useCallback(() => {
+  const [orderId, setOrderId] = useState<string | null>(null);
+
+  const handleConfirm = useCallback(async () => {
     setConfirmState("processing");
-    // Simulate order processing
-    setTimeout(() => {
-      const success = Math.random() > 0.15; // 85% success rate
-      setConfirmState(success ? "success" : "error");
-      playSound(success ? "success" : "error");
-    }, 1800);
-  }, [playSound]);
+    try {
+      const result = await createOrder({
+        symbol: "XAUUSD",
+        side: direction.toLowerCase() as "buy" | "sell",
+        order_type: "market",
+        quantity: parseFloat(lotSize) || 0.1,
+        price: parseFloat(entry) || undefined,
+      });
+      setOrderId(result?.order?.id || null);
+      setConfirmState("success");
+      playSound("success");
+    } catch (err) {
+      console.error("Order failed:", err);
+      setConfirmState("error");
+      playSound("error");
+    }
+  }, [createOrder, direction, lotSize, entry, playSound]);
 
   const handleReset = useCallback(() => {
     setConfirmState("idle");
@@ -518,7 +532,7 @@ const ResultView = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] text-muted-foreground uppercase">Order ID</p>
-              <p className="text-xs font-mono text-foreground">#{Math.floor(100000 + Math.random() * 900000)}</p>
+              <p className="text-xs font-mono text-foreground">#{(window as any).__lastOrderId || "------"}</p>
             </div>
             <div className="text-right">
               <p className="text-[9px] text-muted-foreground uppercase">Status</p>

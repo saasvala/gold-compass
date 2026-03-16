@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Server, Key, Newspaper, Sliders, Clock, Globe, Cpu, Zap, Shield, Target } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
 import SecurityPanel from "@/components/dashboard/SecurityPanel";
+import BrokerConnectionPanel from "@/components/dashboard/BrokerConnectionPanel";
 
 const baseSettings = [
   {
@@ -76,6 +77,7 @@ const SettingsTab = ({ mode }: { mode: TradingMode }) => {
   return (
     <div className="space-y-4">
       <SecurityPanel />
+      <BrokerConnectionPanel />
 
       {sections.map((section, si) => (
         <motion.div
