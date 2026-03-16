@@ -48,10 +48,12 @@ const modeRiskParams: Record<string, { icon: any; label: string; value: string; 
 };
 
 const RiskTab = ({ mode }: { mode: TradingMode }) => {
+  const { events } = useRiskEvents();
   const riskParams = modeRiskParams[mode.id] || modeRiskParams.institutional;
   const ddPct = parseFloat(mode.maxDD);
   const currentDD = 4.2;
   const ddWidth = Math.min((currentDD / ddPct) * 100, 100);
+  const unresolvedEvents = events.filter(e => !e.resolved);
 
   return (
     <div className="space-y-4">
