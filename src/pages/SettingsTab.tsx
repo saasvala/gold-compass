@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Server, Key, Newspaper, Sliders, Clock, Globe, Cpu, Zap, Shield, Target } from "lucide-react";
 import { TradingMode } from "@/lib/modes";
 import SecurityPanel from "@/components/dashboard/SecurityPanel";
+import BrokerConnectionPanel from "@/components/dashboard/BrokerConnectionPanel";
 
 const baseSettings = [
   {
