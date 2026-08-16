@@ -90,24 +90,15 @@ Deno.serve(async (req) => {
           );
         }
 
-        // Risk validation
-        const riskCheck = await validateRisk(supabase, user.id, body);
+        // Risk validation via the Risk Engine service
+        const riskCheck = await validateRisk(authHeader, body);
         if (!riskCheck.passed) {
-          // Log risk event
-          await supabase.from("risk_events").insert({
-            user_id: user.id,
-            bot_id: body.bot_id || null,
-            event_type: "order_rejected",
-            severity: "warning",
-            description: riskCheck.reason,
-            action_taken: "order_blocked",
-          });
-
           return new Response(
-            JSON.stringify({ error: riskCheck.reason, risk_blocked: true }),
+            JSON.stringify({ error: riskCheck.reason, risk_blocked: true, violations: riskCheck.violations }),
             { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
+
 
         const { data: order, error } = await supabase.from("orders").insert({
           user_id: user.id,
