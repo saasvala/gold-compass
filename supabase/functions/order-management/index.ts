@@ -90,24 +90,15 @@ Deno.serve(async (req) => {
           );
         }
 
-        // Risk validation
-        const riskCheck = await validateRisk(supabase, user.id, body);
+        // Risk validation via the Risk Engine service
+        const riskCheck = await validateRisk(authHeader, body);
         if (!riskCheck.passed) {
-          // Log risk event
-          await supabase.from("risk_events").insert({
-            user_id: user.id,
-            bot_id: body.bot_id || null,
-            event_type: "order_rejected",
-            severity: "warning",
-            description: riskCheck.reason,
-            action_taken: "order_blocked",
-          });
-
           return new Response(
-            JSON.stringify({ error: riskCheck.reason, risk_blocked: true }),
+            JSON.stringify({ error: riskCheck.reason, risk_blocked: true, violations: riskCheck.violations }),
             { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
+
 
         const { data: order, error } = await supabase.from("orders").insert({
           user_id: user.id,
@@ -275,51 +266,49 @@ Deno.serve(async (req) => {
   }
 });
 
-async function validateRisk(
-  supabase: ReturnType<typeof createClient>,
-  userId: string,
-  order: OrderRequest
-): Promise<{ passed: boolean; reason: string }> {
-  // Check open positions count
-  const { count: openPositions } = await supabase
-    .from("positions")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("is_open", true);
-
-  if ((openPositions ?? 0) >= 20) {
-    return { passed: false, reason: "Maximum open positions limit (20) reached" };
-  }
-
-  // Check pending orders count
-  const { count: pendingOrders } = await supabase
-    .from("orders")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("status", "pending");
-
-  if ((pendingOrders ?? 0) >= 50) {
-    return { passed: false, reason: "Maximum pending orders limit (50) reached" };
-  }
-
-  // Check daily loss limit from portfolio snapshots
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const { data: todaySnapshot } = await supabase
-    .from("portfolio_snapshots")
-    .select("*")
-    .eq("user_id", userId)
-    .gte("created_at", today.toISOString())
-    .order("created_at", { ascending: true })
-    .limit(1);
-
-  if (todaySnapshot && todaySnapshot.length > 0) {
-    const dailyLoss = todaySnapshot[0].realized_pnl;
-    if (dailyLoss < -500) {
-      return { passed: false, reason: "Daily loss limit ($500) exceeded — circuit breaker active" };
-    }
-  }
-
-  return { passed: true, reason: "" };
+interface RiskViolation {
+  code: string;
+  severity: string;
+  message: string;
 }
+
+async function validateRisk(
+  authHeader: string,
+  order: OrderRequest
+): Promise<{ passed: boolean; reason: string; violations: RiskViolation[] }> {
+  try {
+    const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/risk-engine`, {
+      method: "POST",
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
+        apikey: Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      },
+      body: JSON.stringify({
+        action: "evaluate",
+        symbol: order.symbol,
+        side: order.side,
+        quantity: order.quantity,
+        price: order.price ?? order.stop_price,
+        stop_loss: order.stop_price,
+        bot_id: order.bot_id,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      return { passed: false, reason: data?.error || "Risk engine unavailable", violations: [] };
+    }
+
+    const violations: RiskViolation[] = data.violations ?? [];
+    return {
+      passed: Boolean(data.passed),
+      reason: violations.map((v) => v.message).join("; ") || "Risk check failed",
+      violations,
+    };
+  } catch (e) {
+    console.error("Risk engine call failed:", e);
+    return { passed: false, reason: "Risk engine unavailable — order blocked for safety", violations: [] };
+  }
+}
+

@@ -596,6 +596,60 @@ export type Database = {
           },
         ]
       }
+      risk_limits: {
+        Row: {
+          account_balance: number
+          created_at: string
+          id: string
+          kill_switch_enabled: boolean
+          max_daily_loss_percent: number
+          max_exposure_per_symbol_percent: number
+          max_leverage: number
+          max_open_positions: number
+          max_pending_orders: number
+          max_risk_per_trade_percent: number
+          max_total_drawdown_percent: number
+          pause_reason: string | null
+          trading_paused: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_balance?: number
+          created_at?: string
+          id?: string
+          kill_switch_enabled?: boolean
+          max_daily_loss_percent?: number
+          max_exposure_per_symbol_percent?: number
+          max_leverage?: number
+          max_open_positions?: number
+          max_pending_orders?: number
+          max_risk_per_trade_percent?: number
+          max_total_drawdown_percent?: number
+          pause_reason?: string | null
+          trading_paused?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_balance?: number
+          created_at?: string
+          id?: string
+          kill_switch_enabled?: boolean
+          max_daily_loss_percent?: number
+          max_exposure_per_symbol_percent?: number
+          max_leverage?: number
+          max_open_positions?: number
+          max_pending_orders?: number
+          max_risk_per_trade_percent?: number
+          max_total_drawdown_percent?: number
+          pause_reason?: string | null
+          trading_paused?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       signal_analysis: {
         Row: {
           ai_confidence: number | null
