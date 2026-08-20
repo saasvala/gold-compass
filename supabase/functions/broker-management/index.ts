@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { encryptSecret } from "../_shared/crypto.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,19 +18,6 @@ interface BrokerRequest {
   is_testnet?: boolean;
   permissions?: string[];
   metadata?: Record<string, unknown>;
-}
-
-// Simple AES-like obfuscation for storage (real AES-256 would use Web Crypto API)
-function encryptValue(value: string): string {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(value);
-  return btoa(String.fromCharCode(...data)) + "::enc";
-}
-
-function decryptValue(encrypted: string): string {
-  const raw = encrypted.replace("::enc", "");
-  const decoded = atob(raw);
-  return decoded;
 }
 
 Deno.serve(async (req) => {
@@ -77,9 +65,9 @@ Deno.serve(async (req) => {
             user_id: user.id,
             broker_name: body.broker_name,
             broker_type: body.broker_type || "exchange",
-            api_key_encrypted: encryptValue(body.api_key),
-            api_secret_encrypted: encryptValue(body.api_secret),
-            passphrase_encrypted: body.passphrase ? encryptValue(body.passphrase) : null,
+            api_key_encrypted: await encryptSecret(body.api_key),
+            api_secret_encrypted: await encryptSecret(body.api_secret),
+            passphrase_encrypted: body.passphrase ? await encryptSecret(body.passphrase) : null,
             is_testnet: body.is_testnet ?? true,
             is_active: false,
             permissions: body.permissions || ["read"],
@@ -192,9 +180,9 @@ Deno.serve(async (req) => {
         const updateData: Record<string, unknown> = {};
         if (body.permissions) updateData.permissions = body.permissions;
         if (body.is_testnet !== undefined) updateData.is_testnet = body.is_testnet;
-        if (body.api_key) updateData.api_key_encrypted = encryptValue(body.api_key);
-        if (body.api_secret) updateData.api_secret_encrypted = encryptValue(body.api_secret);
-        if (body.passphrase) updateData.passphrase_encrypted = encryptValue(body.passphrase);
+        if (body.api_key) updateData.api_key_encrypted = await encryptSecret(body.api_key);
+        if (body.api_secret) updateData.api_secret_encrypted = await encryptSecret(body.api_secret);
+        if (body.passphrase) updateData.passphrase_encrypted = await encryptSecret(body.passphrase);
         if (body.metadata) updateData.metadata = body.metadata;
 
         const { data: updated, error } = await supabase
