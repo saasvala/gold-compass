@@ -396,6 +396,97 @@ export type Database = {
         }
         Relationships: []
       }
+      position_drifts: {
+        Row: {
+          auto_corrected: boolean
+          broker_avg_price: number | null
+          broker_connection_id: string | null
+          broker_quantity: number | null
+          created_at: string
+          details: Json
+          drift_type: string
+          fingerprint: string
+          id: string
+          internal_avg_price: number | null
+          internal_quantity: number | null
+          order_id: string | null
+          position_id: string | null
+          quantity_diff: number | null
+          resolved: boolean
+          resolved_at: string | null
+          severity: string
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_corrected?: boolean
+          broker_avg_price?: number | null
+          broker_connection_id?: string | null
+          broker_quantity?: number | null
+          created_at?: string
+          details?: Json
+          drift_type: string
+          fingerprint: string
+          id?: string
+          internal_avg_price?: number | null
+          internal_quantity?: number | null
+          order_id?: string | null
+          position_id?: string | null
+          quantity_diff?: number | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_corrected?: boolean
+          broker_avg_price?: number | null
+          broker_connection_id?: string | null
+          broker_quantity?: number | null
+          created_at?: string
+          details?: Json
+          drift_type?: string
+          fingerprint?: string
+          id?: string
+          internal_avg_price?: number | null
+          internal_quantity?: number | null
+          order_id?: string | null
+          position_id?: string | null
+          quantity_diff?: number | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "position_drifts_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: false
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "position_drifts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "position_drifts_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       positions: {
         Row: {
           avg_entry_price: number
@@ -539,6 +630,56 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      reconciliation_checkpoints: {
+        Row: {
+          broker_connection_id: string
+          created_at: string
+          drifts_found: number
+          id: string
+          last_error: string | null
+          last_fill_ts: string | null
+          last_reconciled_at: string | null
+          last_status: string
+          positions_checked: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          broker_connection_id: string
+          created_at?: string
+          drifts_found?: number
+          id?: string
+          last_error?: string | null
+          last_fill_ts?: string | null
+          last_reconciled_at?: string | null
+          last_status?: string
+          positions_checked?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          broker_connection_id?: string
+          created_at?: string
+          drifts_found?: number
+          id?: string
+          last_error?: string | null
+          last_fill_ts?: string | null
+          last_reconciled_at?: string | null
+          last_status?: string
+          positions_checked?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_checkpoints_broker_connection_id_fkey"
+            columns: ["broker_connection_id"]
+            isOneToOne: true
+            referencedRelation: "broker_connections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       risk_events: {
         Row: {
@@ -1013,11 +1154,72 @@ export type Database = {
         }
         Relationships: []
       }
+      worker_jobs: {
+        Row: {
+          consecutive_failures: number
+          created_at: string
+          id: string
+          job_name: string
+          last_cursor: string | null
+          last_error: string | null
+          last_run_at: string | null
+          last_success_at: string | null
+          lock_token: string | null
+          locked_until: string | null
+          pause_reason: string | null
+          stats: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          job_name: string
+          last_cursor?: string | null
+          last_error?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          lock_token?: string | null
+          locked_until?: string | null
+          pause_reason?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          created_at?: string
+          id?: string
+          job_name?: string
+          last_cursor?: string | null
+          last_error?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          lock_token?: string | null
+          locked_until?: string | null
+          pause_reason?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      acquire_worker_lock: {
+        Args: { _job_name: string; _lease_seconds: number }
+        Returns: {
+          acquired: boolean
+          last_cursor: string
+          lock_token: string
+          pause_reason: string
+          status: string
+        }[]
+      }
       get_bot_leaderboard: {
         Args: never
         Returns: {
@@ -1040,6 +1242,17 @@ export type Database = {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
+        }
+        Returns: boolean
+      }
+      release_worker_lock: {
+        Args: {
+          _cursor: string
+          _error: string
+          _job_name: string
+          _lock_token: string
+          _stats: Json
+          _status: string
         }
         Returns: boolean
       }
