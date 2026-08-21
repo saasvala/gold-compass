@@ -360,3 +360,160 @@ export async function fetchOrderStatus(
   if (broker === "bybit") return bybitStatus(creds, symbol, brokerOrderId);
   throw new Error(`Status polling not supported for broker: ${creds.brokerName}`);
 }
+
+/* ------------------------- Position & fill snapshots ------------------------- */
+// Used by the reconciliation worker to compare venue truth against the internal book.
+
+export interface BrokerPosition {
+  symbol: string;
+  side: "buy" | "sell";
+  quantity: number;
+  avgEntryPrice: number | null;
+  markPrice: number | null;
+  unrealizedPnl: number | null;
+  raw: unknown;
+}
+
+export interface BrokerFill {
+  brokerOrderId: string;
+  tradeId: string;
+  symbol: string;
+  side: "buy" | "sell";
+  quantity: number;
+  price: number;
+  commission: number | null;
+  executedAt: string;
+}
+
+async function binancePositions(creds: BrokerCredentials): Promise<BrokerPosition[]> {
+  // Spot venues expose balances, not positions — a non-zero free+locked balance
+  // is the spot equivalent of a long position.
+  const { ok, body } = await binanceSigned(creds, "GET", "/api/v3/account", {});
+  if (!ok) throw new Error(String((body as Record<string, unknown>).msg ?? "Binance account fetch failed"));
+  const balances = ((body as Record<string, unknown>).balances ?? []) as Record<string, unknown>[];
+  return balances
+    .map((b) => ({ asset: String(b.asset), qty: Number(b.free ?? 0) + Number(b.locked ?? 0), raw: b }))
+    .filter((b) => b.qty > 0 && b.asset !== "USDT" && b.asset !== "USD" && b.asset !== "BUSD")
+    .map((b) => ({
+      symbol: `${b.asset}USDT`,
+      side: "buy" as const,
+      quantity: b.qty,
+      avgEntryPrice: null,
+      markPrice: null,
+      unrealizedPnl: null,
+      raw: b.raw,
+    }));
+}
+
+async function bybitPositions(creds: BrokerCredentials): Promise<BrokerPosition[]> {
+  const category = bybitCategory(creds);
+  if (category === "spot") {
+    const { ok, body } = await bybitSigned(creds, "GET", "/v5/account/wallet-balance", { accountType: "UNIFIED" });
+    if (!ok) throw new Error(String(body.retMsg ?? "Bybit balance fetch failed"));
+    const list = ((body.result as Record<string, unknown>)?.list ?? []) as Record<string, unknown>[];
+    const coins = (list[0]?.coin ?? []) as Record<string, unknown>[];
+    return coins
+      .map((c) => ({ asset: String(c.coin), qty: Number(c.walletBalance ?? 0), raw: c }))
+      .filter((c) => c.qty > 0 && c.asset !== "USDT" && c.asset !== "USDC")
+      .map((c) => ({
+        symbol: `${c.asset}USDT`,
+        side: "buy" as const,
+        quantity: c.qty,
+        avgEntryPrice: null,
+        markPrice: null,
+        unrealizedPnl: null,
+        raw: c.raw,
+      }));
+  }
+
+  const { ok, body } = await bybitSigned(creds, "GET", "/v5/position/list", { category, settleCoin: "USDT" });
+  if (!ok) throw new Error(String(body.retMsg ?? "Bybit position fetch failed"));
+  const list = ((body.result as Record<string, unknown>)?.list ?? []) as Record<string, unknown>[];
+  return list
+    .filter((p) => Number(p.size ?? 0) > 0)
+    .map((p) => ({
+      symbol: String(p.symbol),
+      side: String(p.side).toLowerCase() === "sell" ? ("sell" as const) : ("buy" as const),
+      quantity: Number(p.size ?? 0),
+      avgEntryPrice: p.avgPrice != null ? Number(p.avgPrice) : null,
+      markPrice: p.markPrice != null ? Number(p.markPrice) : null,
+      unrealizedPnl: p.unrealisedPnl != null ? Number(p.unrealisedPnl) : null,
+      raw: p,
+    }));
+}
+
+async function metatraderPositions(creds: BrokerCredentials): Promise<BrokerPosition[]> {
+  const bridgeUrl = String(creds.metadata?.bridge_url ?? "");
+  if (!bridgeUrl) throw new Error("MetaTrader bridge_url not configured on connection");
+  const timestamp = String(Date.now());
+  const signature = await hmacSha256Hex(creds.apiSecret, `positions${timestamp}`);
+  const res = await fetch(`${bridgeUrl.replace(/\/$/, "")}/positions`, {
+    headers: { "X-API-KEY": creds.apiKey, "X-TIMESTAMP": timestamp, "X-SIGNATURE": signature },
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(String(body.error ?? "MT bridge position fetch failed"));
+  const list = (body.positions ?? []) as Record<string, unknown>[];
+  return list.map((p) => ({
+    symbol: String(p.symbol),
+    side: String(p.type ?? p.side).toLowerCase().includes("sell") ? ("sell" as const) : ("buy" as const),
+    quantity: Number(p.volume ?? 0),
+    avgEntryPrice: p.open_price != null ? Number(p.open_price) : null,
+    markPrice: p.current_price != null ? Number(p.current_price) : null,
+    unrealizedPnl: p.profit != null ? Number(p.profit) : null,
+    raw: p,
+  }));
+}
+
+export async function fetchBrokerPositions(creds: BrokerCredentials): Promise<BrokerPosition[]> {
+  const broker = creds.brokerName.toLowerCase();
+  if (broker === "binance") return binancePositions(creds);
+  if (broker === "bybit") return bybitPositions(creds);
+  if (["metatrader", "mt4", "mt5"].includes(broker)) return metatraderPositions(creds);
+  throw new Error(`Position sync not supported for broker: ${creds.brokerName}`);
+}
+
+export async function fetchBrokerFills(
+  creds: BrokerCredentials,
+  symbol: string,
+  sinceMs?: number,
+): Promise<BrokerFill[]> {
+  const broker = creds.brokerName.toLowerCase();
+  const sym = normalizeSymbol(symbol);
+
+  if (broker === "binance") {
+    const params: Record<string, string | number> = { symbol: sym, limit: 100 };
+    if (sinceMs) params.startTime = sinceMs;
+    const { ok, body } = await binanceSigned(creds, "GET", "/api/v3/myTrades", params);
+    if (!ok) throw new Error(String((body as Record<string, unknown>).msg ?? "Binance fills fetch failed"));
+    return (body as unknown as Record<string, unknown>[]).map((t) => ({
+      brokerOrderId: String(t.orderId),
+      tradeId: String(t.id),
+      symbol: sym,
+      side: t.isBuyer ? "buy" : "sell",
+      quantity: Number(t.qty ?? 0),
+      price: Number(t.price ?? 0),
+      commission: t.commission != null ? Number(t.commission) : null,
+      executedAt: new Date(Number(t.time ?? Date.now())).toISOString(),
+    }));
+  }
+
+  if (broker === "bybit") {
+    const params: Record<string, string | number> = { category: bybitCategory(creds), symbol: sym, limit: 100 };
+    if (sinceMs) params.startTime = sinceMs;
+    const { ok, body } = await bybitSigned(creds, "GET", "/v5/execution/list", params);
+    if (!ok) throw new Error(String(body.retMsg ?? "Bybit fills fetch failed"));
+    const list = ((body.result as Record<string, unknown>)?.list ?? []) as Record<string, unknown>[];
+    return list.map((t) => ({
+      brokerOrderId: String(t.orderId),
+      tradeId: String(t.execId),
+      symbol: sym,
+      side: String(t.side).toLowerCase() === "sell" ? "sell" : "buy",
+      quantity: Number(t.execQty ?? 0),
+      price: Number(t.execPrice ?? 0),
+      commission: t.execFee != null ? Number(t.execFee) : null,
+      executedAt: new Date(Number(t.execTime ?? Date.now())).toISOString(),
+    }));
+  }
+
+  throw new Error(`Fill history not supported for broker: ${creds.brokerName}`);
+}
